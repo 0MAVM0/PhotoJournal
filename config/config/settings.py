@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     'drf_yasg',
 
     # Custom apps
-    # 'users',
+    'users',
     # 'posts',
     # 'comments',
     # 'likes',

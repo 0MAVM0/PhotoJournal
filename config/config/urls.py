@@ -25,7 +25,7 @@ urlpatterns = [
 
     # Django core and other applications
     path('admin/', admin.site.urls),
-    # path('', include('users.urls'))
+    path('api/users/', include('users.urls'))
 ]
 
 if settings.DEBUG:
