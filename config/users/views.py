@@ -1,4 +1,4 @@
-from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
 
 from .serializers import RegisterSerializer, UserProfileSerializer, UserUpdateSerializer
@@ -21,6 +21,6 @@ class ProfileView(RetrieveUpdateAPIView):
         return UserProfileSerializer
 
 
-class UserPublicProfileView(RetrieveUpdateAPIView):
+class UserPublicProfileView(RetrieveAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserProfileSerializer
