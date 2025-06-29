@@ -1,4 +1,5 @@
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django.core.exceptions import PermissionDenied
 from .serializers import PostSerializer
 from .models import Post
@@ -7,6 +8,7 @@ from .models import Post
 class PostListCreateView(ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    permission_classes = [ IsAuthenticatedOrReadOnly ]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -15,6 +17,7 @@ class PostListCreateView(ListCreateAPIView):
 class PostRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    permission_classes = [ IsAuthenticatedOrReadOnly ]
 
     def perform_update(self, serializer):
         if self.request.user != self.get_object().user:
