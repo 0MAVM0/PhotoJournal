@@ -1,6 +1,7 @@
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from django.core.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied
+
 from .serializers import PostSerializer
 from .models import Post
 
@@ -23,7 +24,7 @@ class PostRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
         if self.request.user != self.get_object().user:
             raise PermissionDenied('You do not have permission to edit this post.')
         serializer.save()
-    
+
     def perform_destroy(self, instance):
         if self.request.user != instance.user:
             raise PermissionDenied('You do not have permission to delete this post.')
