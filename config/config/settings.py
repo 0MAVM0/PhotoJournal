@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     # Custom apps
     'users',
     'posts',
-    # 'comments',
+    'comments',
     # 'likes',
 ]
 
