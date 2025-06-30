@@ -10,4 +10,5 @@ urlpatterns = [
     path('<int:id>/comments/', include('comments.urls')),
 
     # Likes
+    path('<int:id>/like/', include('likes.urls'))
 ]

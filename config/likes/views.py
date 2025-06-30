@@ -6,8 +6,8 @@ from posts.models import Post
 from .models import Like
 
 class LikePostView(APIView):
-    def post(self, request, post_id):
-        post = Post.objects.filter(id=post_id).first()
+    def post(self, request, id):
+        post = Post.objects.filter(id=id).first()
         if not post:
             return Response({ 'message' : 'Post Was Not Found' }, status=status.HTTP_404_NOT_FOUND)
         
@@ -17,8 +17,8 @@ class LikePostView(APIView):
         
         return Response({ 'message' : 'Liked' }, status=status.HTTP_201_CREATED)
     
-    def delete(self, request, post_id):
-        like = Like.objects.filter(user=request.user, post__id=post_id).first()
+    def delete(self, request, id):
+        like = Like.objects.filter(user=request.user, post__id=id).first()
         if not like:
             return Response({ 'message' : 'You Have Not Liked This Post Yet' }, status=status.HTTP_400_BAD_REQUEST)
 
