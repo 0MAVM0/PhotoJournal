@@ -3,7 +3,6 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import PermissionDenied
 
 from .serializers import PostSerializer
-from likes.models import Like
 from .models import Post
 
 
@@ -14,7 +13,7 @@ class PostListCreateView(ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-    
+
     def get_serializer_context(self):
         return { 'request' : self.request }
 
@@ -40,16 +39,16 @@ class MyPostsView(ListAPIView):
 
     def get_queryset(self):
         return Post.objects.filter(user=self.request.user).order_by('-created_at')
-    
+
     def get_serializer_context(self):
         return { 'request' : self.request }
 
 
 class LikedPostsView(ListAPIView):
     serializer_class = PostSerializer
-    
+
     def get_queryset(self):
         return Post.objects.filter(likes__user=self.request.user).order_by('-created_at')
-    
+
     def get_serializer_context(self):
         return { 'request' : self.request }
