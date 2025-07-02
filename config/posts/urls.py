@@ -1,9 +1,10 @@
 from django.urls import path, include
-from .views import PostListCreateView, PostRetrieveUpdateDestroyView
+from .views import PostListCreateView, PostRetrieveUpdateDestroyView, MyPostsView
 
 urlpatterns = [
     # Posts
     path('', PostListCreateView.as_view(), name='post-list-create'),
+    path('my/', MyPostsView.as_view(), name='my-posts'),
     path('<int:pk>/', PostRetrieveUpdateDestroyView.as_view(), name='post-detail'),
 
     # Comments
