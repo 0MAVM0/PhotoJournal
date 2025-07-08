@@ -6,6 +6,7 @@ from .models import CustomUser
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)
+    avatar = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = CustomUser
@@ -34,6 +35,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
+    avatar = serializers.ImageField(required=False, allow_null=True)
+
     class Meta:
         model = CustomUser
         fields = ('username', 'first_name', 'last_name', 'bio', 'avatar')
