@@ -10,6 +10,14 @@ from .forms import RegisterForm
 from posts.models import Post
 
 
+@method_decorator(login_required, name='dispatch')
+class HomeView(View):
+    def get(self, request):
+        posts = Post.objects.all().order_by('-created_at')
+
+        return render(request, 'home.html', { 'posts': posts })
+
+
 class RegisterPageView(View):
     def get(self, request):
         form = RegisterForm()
