@@ -16,35 +16,35 @@
             {% endif %}
             <div class="mb-3">
                 <label for="id_username" class="form-label">Username</label>
-                {{ form.username|as_widget:attrs }}
+                {{ form.username|add_class:"form-control" }}
                 {% if form.username.errors %}
                     <div class="text-danger small">{{ form.username.errors.0 }}</div>
                 {% endif %}
             </div>
             <div class="mb-3">
                 <label for="id_email" class="form-label">Email</label>
-                {{ form.email|as_widget:attrs }}
+                {{ form.email|add_class:"form-control" }}
                 {% if form.email.errors %}
                     <div class="text-danger small">{{ form.email.errors.0 }}</div>
                 {% endif %}
             </div>
             <div class="mb-3">
                 <label for="id_password" class="form-label">Password</label>
-                {{ form.password|as_widget:attrs }}
+                {{ form.password|add_class:"form-control" }}
                 {% if form.password.errors %}
                     <div class="text-danger small">{{ form.password.errors.0 }}</div>
                 {% endif %}
             </div>
             <div class="mb-3">
                 <label for="id_password2" class="form-label">Confirm Password</label>
-                {{ form.password2|as_widget:attrs }}
+                {{ form.password2|add_class:"form-control" }}
                 {% if form.password2.errors %}
                     <div class="text-danger small">{{ form.password2.errors.0 }}</div>
                 {% endif %}
             </div>
             <div class="mb-3">
                 <label for="id_bio" class="form-label">Bio (optional)</label>
-                {{ form.bio|as_widget:attrs }}
+                {{ form.bio|add_class:"form-control" }}
             </div>
             <div class="mb-3">
                 <label for="id_avatar" class="form-label">Avatar (optional)</label>
@@ -58,6 +58,3 @@
         </p>        
     </div>
 {% endblock %}
-
-{% with attrs="class=form-control" %}
-{% endwith %}
