@@ -1,12 +1,15 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import method_decorator
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
+from django.views.generic import CreateView
 from django.contrib.auth import login
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.views import View
 
+from posts.forms import PostCreateForm
 from .forms import RegisterForm
 from posts.models import Post
 
@@ -51,3 +54,14 @@ class LoginPageView(LoginView):
 
     def get_success_url(self):
         return reverse_lazy('home')
+
+
+class CreatePostView(LoginRequiredMixin, CreateView):
+    model = Post
+    form_class = PostCreateForm
+    template_name = 'create_post.html'
+    success_url = reverse_lazy('home')
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
