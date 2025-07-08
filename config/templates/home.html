@@ -4,32 +4,31 @@
 {% block title %}Home | PhotoJunior{% endblock %}
 
 {% block content %}
-    <h2 class="mb-4 text-center">Latest Posts</h2>
-    {% if posts %}
-        {% for post in posts %}
-            <div class="post-card p-3">
-                <div class="d-flex align-items-center mb-2">
-                    {% if post.user.avatar %}
-                        <img src="{{ post.user.avatar.url }}" class="avatar">
-                    {% else %}
-                        <img src="{% static 'img/default-avatar.png' %}" class="avatar">
-                    {% endif %}
-                    <strong>{{ post.user.username }}</strong>
+    <div class="container mt-4">
+        <h2 class="mb-4 text-center">Feed</h2>
+        {% if posts %}
+            {% for post in posts %}
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header d-flex align-items-center">
+                        <img src="{{ post.user.avatar.url }}" alt="avatar" class="rounded-circle me-2" width="40" height="40">
+                        <strong>{{ post.user.username }}</strong>
+                    </div>
+                    <img src="{{ post.image.url }}" class="card-img-top" alt="Post image">
+                    <div class="card-body">
+                        {% if post.caption %}
+                            <p class="card-text">{{ post.caption }}</p>
+                        {% endif %}
+                        <div class="d-flex justify-content-between text-muted small">
+                            <div>{{ post.created_at|date:"F j, Y" }}</div>
+                            <div>{{ post.likes_count }} likes • {{ post.comments_count }} comments</div>
+                        </div>
+                    </div>
                 </div>
-                <img src="{{ post.image.url }}" class="img-fluid mb-2 rounded" alt="Post Image">
-                {% if post.caption %}
-                    <p>{{ post.caption }}</p>
-                {% endif %}
-                <div class="d-flex justify-content-between text-muted small">
-                    <div>{{ post.likes_count }} likes</div>
-                    <div>{{ post.comments_count }} comments</div>
-                </div>
-                <div class="text-end text-muted small">
-                    {{ post.created_at|date:"M d, Y H:i" }}
-                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info text-center">
+                No posts yet. <a href="{% url 'create-post' %}">Create one?</a>
             </div>
-        {% endfor %}
-    {% else %}
-        <p class="text-center text-muted">No posts yet.</p>
-    {% endif %}
+        {% endif %}
+    </div>
 {% endblock %}
