@@ -1,0 +1,43 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #fafafa;
+    padding-top: 70px;
+}
+.navbar {
+    background-color: white;
+    border-bottom: 1px solid #dbdbdb;
+}
+.navbar-brand {
+    font-weight: bold;
+    color: #262626;
+    font-size: 22px;
+}
+.navbar-nav .nav-link {
+    color: #262626;
+    font-weight: 500;
+}
+.container-main {
+    max-width: 600px;
+    margin: 0 auto;
+}
+.post-card {
+    background: white;
+    border: 1px solid #dbdbdb;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+.messages {
+    margin-bottom: 20px;
+}
+.form-control:focus {
+    box-shadow: none;
+    border-color: #aaa;
+}
