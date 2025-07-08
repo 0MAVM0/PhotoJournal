@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load form_tags %}
+
+{% block title %}Create Post | PhotoJunior{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm p-4 mt-4">
+    <h3 class="text-center mb-3">Create a New Post</h3>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="id_image" class="form-label">Image</label>
+            {{ form.image|add_class:"form-control" }}
+            {% if form.image.errors %}
+                <div class="text-danger small">{{ form.image.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="id_caption" class="form-label">Caption</label>
+            {{ form.caption|add_class:"form-control" }}
+            {% if form.caption.errors %}
+                <div class="text-danger small">{{ form.caption.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Post</button>
+    </form>
+</div>
+{% endblock %}
