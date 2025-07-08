@@ -9,8 +9,8 @@ urlpatterns = [
     path('<int:pk>/', PostRetrieveUpdateDestroyView.as_view(), name='post-detail'),
 
     # Comments
-    path('<int:id>/comments/', include('comments.urls')),
+    path('<int:id>/comments/', include('comments.urls'), name='comment-list-create'),
 
     # Likes
-    path('<int:id>/like/', include('likes.urls'))
+    path('<int:id>/like/', include('likes.urls'), name='like-post')
 ]

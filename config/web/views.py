@@ -24,6 +24,12 @@ class HomeView(ListView):
     def get_queryset(self):
         return Post.objects.select_related('user').prefetch_related('likes', 'comments').order_by('-created_at')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        for post in context['posts']:
+            post.is_liked_by_me = post.likes.filter(user=self.request.user).exists()
+        return context
+
 
 class RegisterPageView(View):
     def get(self, request):
