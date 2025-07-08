@@ -2,8 +2,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import method_decorator
 from django.contrib.auth.views import LoginView
+from django.views.generic import CreateView, ListView
 from django.shortcuts import render, redirect
-from django.views.generic import CreateView
 from django.contrib.auth import login
 from django.urls import reverse_lazy
 from django.contrib import messages
@@ -15,11 +15,14 @@ from posts.models import Post
 
 
 @method_decorator(login_required, name='dispatch')
-class HomeView(View):
-    def get(self, request):
-        posts = Post.objects.all().order_by('-created_at')
+class HomeView(ListView):
+    model = Post
+    template_name = 'home.html'
+    context_object_name = 'posts'
+    ordering = ['-created_at']
 
-        return render(request, 'home.html', { 'posts': posts })
+    def get_queryset(self):
+        return Post.objects.select_related('user').prefetch_related('likes', 'comments').order_by('-created_at')
 
 
 class RegisterPageView(View):
