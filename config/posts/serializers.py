@@ -12,13 +12,13 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ('id', 'user', 'image', 'caption', 'created_at', 'comments_count', 'likes_count', 'is_liked_by_me')
         read_only_fields = ['id', 'user', 'created_at', 'comments_count', 'likes_count', 'is_liked_by_me']
-    
+
     def get_comments_count(self, obj):
         return obj.comments.count()
-    
+
     def get_likes_count(self, obj):
         return obj.likes.count()
-    
+
     def get_is_liked_by_me(self, obj):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
