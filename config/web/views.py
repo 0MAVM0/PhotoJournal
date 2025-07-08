@@ -3,6 +3,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
+from django.urls import reverse_lazy
 from django.contrib import messages
 from django.views import View
 
@@ -49,4 +50,4 @@ class LoginPageView(LoginView):
         return super().form_invalid(form)
 
     def get_success_url(self):
-        return redirect('home')
+        return reverse_lazy('home')
