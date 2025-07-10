@@ -19,23 +19,29 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'home' %}">
                             <i class="fas fa-home"></i>
+                            Home
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/posts/create/">
-                            <i class="fas fa-plus-square"></i>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/me/">
-                            <i class="fas fa-user-circle"></i>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-danger" href="/logout/">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </a>
-                    </li>
+                    {% if user.is_authenticated %}    
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'create-post' %}">
+                                <i class="fas fa-plus-square"></i>
+                                New Post
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/me/">
+                                <i class="fas fa-user-circle"></i>
+                                Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-danger" href="/logout/">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>

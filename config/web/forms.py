@@ -2,6 +2,8 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import get_user_model
 from django import forms
 
+from posts.models import Post
+
 User = get_user_model()
 
 class RegisterForm(forms.ModelForm):
@@ -29,3 +31,9 @@ class RegisterForm(forms.ModelForm):
         if cleaned_data.get('password') != cleaned_data.get('password2'):
             self.add_error('password2', "Passwords do not match.")
         return cleaned_data
+
+
+class PostEditForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['image', 'caption']

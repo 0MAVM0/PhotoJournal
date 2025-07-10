@@ -9,9 +9,9 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.views import View
 
+from .forms import RegisterForm, PostEditForm
 from posts.forms import PostCreateForm
 from comments.models import Comment
-from .forms import RegisterForm
 from posts.models import Post
 
 
@@ -87,7 +87,41 @@ def add_comment(request, post_id):
             post=post,
             content=content
         )
-        messages.success(request, "Comment added.")
+        messages.success(request, 'Comment added.')
     else:
-        messages.error(request, "Comment cannot be empty.")
+        messages.error(request, 'Comment cannot be empty.')
     return redirect('home')
+
+
+@method_decorator(login_required, name='dispatch')
+class DeletePostView(View):
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        if post.user != request.user:
+            messages.error(request, 'You do not have permission to delete this post.')
+            return redirect('home')
+        post.delete()
+        messages.success(request, 'Post deleted successfully.')
+        return redirect('home')
+
+
+class EditPostView(View):
+    def get(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        if post.user != request.user:
+            messages.error(request, "You cannot edit this post.")
+            return redirect('home')
+        form = PostEditForm(instance=post)
+        return render(request, 'edit_post.html', {'form': form, 'post': post})
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        if post.user != request.user:
+            messages.error(request, "You cannot edit this post.")
+            return redirect('home')
+        form = PostEditForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Post updated successfully.")
+            return redirect('home')
+        return render(request, 'edit_post.html', {'form': form, 'post': post})
