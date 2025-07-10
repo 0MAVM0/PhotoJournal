@@ -1,15 +1,16 @@
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import method_decorator
 from django.contrib.auth.views import LoginView
 from django.views.generic import CreateView, ListView
-from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.views import View
 
 from posts.forms import PostCreateForm
+from comments.models import Comment
 from .forms import RegisterForm
 from posts.models import Post
 
@@ -74,3 +75,19 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
+
+
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    content = request.POST.get('content')
+
+    if content:
+        Comment.objects.create(
+            user=request.user,
+            post=post,
+            content=content
+        )
+        messages.success(request, "Comment added.")
+    else:
+        messages.error(request, "Comment cannot be empty.")
+    return redirect('home')
