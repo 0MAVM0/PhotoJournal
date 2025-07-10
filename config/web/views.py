@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import CreateView, ListView
+from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
 from django.contrib.auth.views import LoginView
-from django.views.generic import CreateView, ListView
 from django.contrib.auth import login
 from django.urls import reverse_lazy
 from django.contrib import messages
@@ -13,6 +14,7 @@ from .forms import RegisterForm, PostEditForm
 from posts.forms import PostCreateForm
 from comments.models import Comment
 from posts.models import Post
+from likes.models import Like
 
 
 @method_decorator(login_required, name='dispatch')
@@ -76,7 +78,19 @@ class CreatePostView(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
+@require_POST
+def like_unlike_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    like, created = Like.objects.get_or_create(user=request.user, post=post)
 
+    if not created:
+        like.delete()
+        messages.info(request, 'Post unliked.')
+    else:
+        messages.success(request, 'Post liked.')
+    return redirect('home')
+
+@require_POST
 def add_comment(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     content = request.POST.get('content')
@@ -91,7 +105,6 @@ def add_comment(request, post_id):
     else:
         messages.error(request, 'Comment cannot be empty.')
     return redirect('home')
-
 
 @method_decorator(login_required, name='dispatch')
 class DeletePostView(View):
