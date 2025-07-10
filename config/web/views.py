@@ -184,3 +184,12 @@ class LikedPostsView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Post.objects.filter(likes=self.request.user).select_related('user').prefetch_related('comments')
+
+
+class UserSearchView(View):
+    def get(self, request):
+        query = request.GET.get('q')
+        users = CustomUser.objects.all()
+        if query:
+            users = users.filter(username__icontains=query)
+        return render(request, 'user_search.html', { 'users' : users, 'query' : query })
