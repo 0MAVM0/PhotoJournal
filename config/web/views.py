@@ -1,3 +1,4 @@
+from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -174,3 +175,12 @@ class EditProfileView(View):
             return redirect('profile', username=request.user.username)
         messages.error(request, 'Please correct the errors below.')
         return render(request, 'edit_profile.html', { 'form': form })
+
+
+class LikedPostsView(LoginRequiredMixin, ListView):
+    model = Post
+    template_name = 'liked_posts.html'
+    context_object_name = 'liked_posts'
+
+    def get_queryset(self):
+        return Post.objects.filter(likes=self.request.user).select_related('user').prefetch_related('comments')

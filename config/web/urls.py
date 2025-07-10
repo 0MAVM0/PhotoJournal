@@ -12,4 +12,5 @@ urlpatterns = [
     path('comment/<int:post_id>/', add_comment, name='comment-list-create'),
     path('profile/<str:username>/', ProfileView.as_view(), name='profile'),
     path('edit-profile/', EditProfileView.as_view(), name='edit-profile'),
+    path('liked/', LikedPostsView.as_view(), name='liked-posts'),
 ]
