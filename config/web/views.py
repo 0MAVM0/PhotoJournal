@@ -12,6 +12,7 @@ from django.views import View
 
 from .forms import RegisterForm, PostEditForm
 from posts.forms import PostCreateForm
+from users.forms import UserUpdateForm
 from comments.models import Comment
 from users.models import CustomUser
 from posts.models import Post
