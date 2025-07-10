@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile | PhotoJournal{% endblock %}
+
+{% block content %}
+    <div class="card shadow-sm p-4 mt-4">
+        <h3 class="mb-4">Edit Your Profile</h3>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+            <div class="mb-3">
+                <label for="id_username" class="form-label">Username</label>
+                {{ form.username|add_class:"form-control" }}
+                {% if form.username.errors %}
+                    <div class="text-danger small">{{ form.username.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="mb-3">
+                <label for="id_email" class="form-label">Email</label>
+                {{ form.email|add_class:"form-control" }}
+                {% if form.email.errors %}
+                    <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="mb-3">
+                <label for="id_bio" class="form-label">Bio</label>
+                {{ form.bio|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+                <label for="id_avatar" class="form-label">Avatar</label><br>
+                {% if request.user.avatar %}
+                    <img src="{{ request.user.avatar.url }}" alt="Current avatar" class="mb-2 rounded-circle" width="80">
+                {% endif %}
+                {{ form.avatar }}
+            </div>
+            <button type="submit" class="btn btn-dark w-100">Save Changes</button>
+        </form>
+    </div>
+{% endblock %}

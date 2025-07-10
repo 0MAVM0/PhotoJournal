@@ -157,3 +157,19 @@ class ProfileView(View):
         }
 
         return render(request, 'profile.html', context)
+
+
+@method_decorator(login_required, name='dispatch')
+class EditProfileView(View):
+    def get(self, request):
+        form = UserUpdateForm(instance=request.user)
+        return render(request, 'edit_profile.html', { 'form' : form })
+    
+    def post(self, request):
+        form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully.')
+            return redirect('profile', username=request.user.username)
+        messages.error(request, 'Please correct the errors below.')
+        return render(request, 'edit_profile.html', { 'form': form })

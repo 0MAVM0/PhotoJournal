@@ -11,4 +11,5 @@ urlpatterns = [
     path('like/<int:post_id>/', like_unlike_post, name='like-unlike-post'),
     path('comment/<int:post_id>/', add_comment, name='comment-list-create'),
     path('profile/<str:username>/', ProfileView.as_view(), name='profile'),
+    path('edit-profile/', EditProfileView.as_view(), name='edit-profile'),
 ]
