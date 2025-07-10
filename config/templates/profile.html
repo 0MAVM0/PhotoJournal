@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile_user.username }}'s Profile | PhotoJournal{% endblock %}
+
+{% block content %}
+    <div class="card shadow-sm p-4 mt-4">
+        <div class="d-flex align-items-center">
+            {% if profile_user.avatar %}
+                <img src="{{ profile_user.avatar.url }}" class="rounded-circle me-3" width="80" height="80" alt="Avatar">
+            {% else %}
+                <img src="https://via.placeholder.com/80" class="rounded-circle me-3" alt="Default Avatar">
+            {% endif %}
+            <div>
+                <h4 class="mb-0">{{ profile_user.username }}</h4>
+                <p class="text-muted mb-0">{{ profile_user.email }}</p>
+            </div>
+        </div>
+        {% if profile_user.bio %}
+            <p class="mt-3">{{ profile_user.bio }}</p>
+        {% endif %}
+    </div>
+
+    <h4 class="mt-4">Posts</h4>
+    {% if posts %}
+        {% for post in posts %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    <strong><a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a></strong>
+                    • {{ post.created_at|date:"M d, Y H:i" }}
+                </div>
+                <img src="{{ post.image.url }}" class="card-img-top" alt="Post image">
+                <div class="card-body">
+                    <p class="card-text">{{ post.caption }}</p>
+                    <form method="post" action="{% url 'like-unlike-post' post.id %}">
+                        {% csrf_token %}
+                        {% if post.is_liked_by_me %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Unlike</button>
+                        {% else %}
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Like</button>
+                        {% endif %}
+                        <span class="ms-2">{{ post.likes_count }} like{{ post.likes_count|pluralize }}</span>
+                    </form>
+                    <div class="mt-3">
+                        <h6>Comments ({{ post.comments_count }})</h6>
+                        {% for comment in post.comments.all|slice":3" %}
+                            <div class="mb-1">
+                                <strong>{{ comment.user }}:</strong> {{ comment.content }}
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">No comments yet.</p>
+                        {% endfor %}
+                    </div>
+                    {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'comment-list-create' post.id %}">
+                            {% csrf_token %}
+                            <div class="input-group mt-2">
+                                <input type="text" name="content" class="form-control" placeholder="Add a comment...">
+                                <button class="btn btn-dark" type="submit">Post</button>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted mt-3">This user has no posts yet.</p>
+    {% endif %}
+{% endblock %}

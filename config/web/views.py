@@ -13,6 +13,7 @@ from django.views import View
 from .forms import RegisterForm, PostEditForm
 from posts.forms import PostCreateForm
 from comments.models import Comment
+from users.models import CustomUser
 from posts.models import Post
 from likes.models import Like
 
@@ -138,3 +139,21 @@ class EditPostView(View):
             messages.success(request, "Post updated successfully.")
             return redirect('home')
         return render(request, 'edit_post.html', {'form': form, 'post': post})
+
+
+class ProfileView(View):
+    def get(self, request, username):
+        profile_user = get_object_or_404(CustomUser, username=username)
+        posts = Post.objects.filter(user=profile_user).order_by('-created_at')
+
+        for post in posts:
+            post.is_liked_by_me = post.likes.filter(user=request.user).exists() if request.user.is_authenticated else False
+            post.likes_count = post.likes.count()
+            post.comment_count = post.comments.count()
+        
+        context = {
+            'profile_user' : profile_user,
+            'posts' : posts,
+        }
+
+        return render(request, 'profile.html', context)
