@@ -26,14 +26,19 @@ class HomeView(ListView):
     template_name = 'home.html'
     context_object_name = 'posts'
     ordering = ['-created_at']
+    paginate_by = 5
 
     def get_queryset(self):
         return Post.objects.select_related('user').prefetch_related('likes', 'comments').order_by('-created_at')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        for post in context['posts']:
-            post.is_liked_by_me = post.likes.filter(user=self.request.user).exists()
+        if self.request.user.is_authenticated:
+            liked_posts_ids = set(self.request.user.likes.values_list('post_id', flat=True))
+            for post in context['posts']:
+                post.is_liked_by_me = post.id in liked_posts_ids
+                post.likes_count = post.likes.count()
+                post.comments_count = post.comments.count()
         return context
 
 
