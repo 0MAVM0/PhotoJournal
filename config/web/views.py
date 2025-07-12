@@ -41,6 +41,9 @@ class HomeView(ListView):
                 post.is_liked_by_me = post.id in liked_posts_ids
                 post.likes_count = post.likes.count()
                 post.comments_count = post.comments.count()
+        else:
+            for post in context['posts']:
+                post.is_liked_by_me = post.likes.filter(user=self.request.user).exists()
         return context
 
 
