@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import login
+from django.db.models import Subquery
 from django.urls import reverse_lazy
 from django.http import JsonResponse
 from django.contrib import messages
@@ -192,10 +193,14 @@ class EditProfileView(View):
 class LikedPostsView(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'liked_posts.html'
-    context_object_name = 'liked_posts'
+    context_object_name = 'posts'
+    paginate_by = 10
 
     def get_queryset(self):
-        return Post.objects.filter(likes=self.request.user).select_related('user').prefetch_related('comments')
+        liked_post_ids = Like.objects.filter(user=self.request.user).values('post_id')
+        return Post.objects.filter(id__in=Subquery(liked_post_ids))\
+            .select_related('user')\
+            .prefetch_related('comments')
 
 
 class UserSearchView(View):
