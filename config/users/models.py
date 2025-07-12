@@ -1,6 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 import uuid
+import os
+
+from web.tasks import resize_avatar
 
 
 class CustomUser(AbstractUser):
@@ -15,3 +18,15 @@ class CustomUser(AbstractUser):
     @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
+
+    def save(self, *args, **kwargs):
+        old_avatar = None
+        if self.pk:
+            old_avatar = CustomUser.objects.get(pk=self.pk).avatar
+
+        super().save(*args, **kwargs)
+
+        if self.avatar and self.avatar != old_avatar:
+            resize_avatar.delay(self.avatar.path)
+            if old_avatar and os.path.isfile(old_avatar.path) and old_avatar != self.avatar:
+                os.remove(old_avatar.path)

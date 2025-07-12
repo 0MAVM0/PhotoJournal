@@ -1,5 +1,8 @@
 from django.db import models
+import os
+
 from users.models import CustomUser
+
 
 class Post(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='posts')
@@ -9,3 +12,8 @@ class Post(models.Model):
 
     def is_liked_by(self, user):
         return self.likes.filter(user=user).exists()
+
+    def delete(self, *args, **kwargs):
+        if self.image and os.path.isfile(self.image.path):
+            os.remove(self.image.path)
+        super().delete(*args, **kwargs)
