@@ -8,6 +8,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import login
 from django.urls import reverse_lazy
+from django.http import JsonResponse
 from django.contrib import messages
 from django.views import View
 
@@ -87,32 +88,36 @@ class CreatePostView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 @require_POST
-def like_unlike_post(request, post_id):
+def ajax_like_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    like, created = Like.objects.get_or_create(user=request.user, post=post)
+    user = request.user
+    liked = post.likes.filter(id=user.id).exists()
 
-    if not created:
-        like.delete()
-        messages.info(request, 'Post unliked.')
+    if liked:
+        post.likes.remove(user)
     else:
-        messages.success(request, 'Post liked.')
-    return redirect('home')
+        post.likes.add(user)
+
+    return JsonResponse({
+        'liked': not liked,
+        'likes_count': post.likes.count(),
+    })
 
 @require_POST
-def add_comment(request, post_id):
+def ajax_comment_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    content = request.POST.get('content')
+    content = request.POST.get('content', '').strip()
 
     if content:
-        Comment.objects.create(
-            user=request.user,
-            post=post,
-            content=content
-        )
-        messages.success(request, 'Comment added.')
-    else:
-        messages.error(request, 'Comment cannot be empty.')
-    return redirect('home')
+        comment = Comment.objects.create(post=post, user=request.user, content=content)
+        return JsonResponse({
+            'user': request.user.username,
+            'content': comment.content,
+            'created': comment.created_at.strftime('%Y-%m-%d %H:%M'),
+            'comments_count': post.comments.count(),
+        })
+
+    return JsonResponse({'error': 'Empty content'}, status=400)
 
 @method_decorator(login_required, name='dispatch')
 class DeletePostView(View):

@@ -22,7 +22,7 @@ function loadMorePosts() {
     .then(res => res.json())
     .then(data => {
         if (data.html.trim().length === 0) {
-            observer.disconnect(); // больше нечего грузить
+            observer.disconnect();
         } else {
             postContainer.insertAdjacentHTML('beforeend', data.html);
             page += 1;
@@ -34,3 +34,52 @@ function loadMorePosts() {
         loader.style.display = 'none';
     });
 }
+document.addEventListener('DOMContentLoaded', () => {
+    document.body.addEventListener('submit', async function (e) {
+        if (e.target.classList.contains('like-form')) {
+            e.preventDefault();
+            const form = e.target;
+            const postId = form.dataset.postId;
+            const response = await fetch(`/like/${postId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                form.querySelector('button').textContent = data.liked ? 'Unlike' : 'Like';
+                form.querySelector('button').className = 'btn btn-sm ' + (data.liked ? 'btn-outline-danger' : 'btn-outline-primary');
+                form.querySelector('.like-count').textContent = data.likes_count;
+            }
+        }
+    });
+    document.body.addEventListener('submit', async function (e) {
+        if (e.target.classList.contains('comment-form')) {
+            e.preventDefault();
+            const form = e.target;
+            const postId = form.dataset.postId;
+            const input = form.querySelector('input[name=content]');
+            const content = input.value;
+
+            const response = await fetch(`/comment/${postId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new URLSearchParams({ content })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                const commentList = form.closest('.card-body').querySelector('.comment-list');
+                const newComment = document.createElement('div');
+                newComment.classList.add('mb-1');
+                newComment.innerHTML = `<strong>${data.user}</strong>: ${data.content}`;
+                commentList.prepend(newComment);
+                input.value = '';
+            }
+        }
+    });
+});
