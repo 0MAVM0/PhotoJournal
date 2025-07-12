@@ -32,7 +32,7 @@
                 <img src="{{ post.image.url }}" class="card-img-top" alt="Post image">
                 <div class="card-body">
                     <p class="card-text">{{ post.caption }}</p>
-                    <form method="post" action="{% url 'like-unlike-post' post.id %}">
+                    <form method="post" action="{% url 'ajax-like-post' post.id %}">
                         {% csrf_token %}
                         {% if post.is_liked_by_me %}
                             <button type="submit" class="btn btn-sm btn-outline-danger">Unlike</button>
@@ -52,7 +52,7 @@
                         {% endfor %}
                     </div>
                     {% if user.is_authenticated %}
-                        <form method="post" action="{% url 'comment-list-create' post.id %}">
+                        <form method="post" action="{% url 'ajax-comment-post' post.id %}">
                             {% csrf_token %}
                             <div class="input-group mt-2">
                                 <input type="text" name="content" class="form-control" placeholder="Add a comment...">

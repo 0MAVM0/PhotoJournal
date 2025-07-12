@@ -34,11 +34,13 @@ function loadMorePosts() {
         loader.style.display = 'none';
     });
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     document.body.addEventListener('submit', async function (e) {
-        if (e.target.classList.contains('like-form')) {
+        const form = e.target;
+
+        if (form.classList.contains('like-form')) {
             e.preventDefault();
-            const form = e.target;
             const postId = form.dataset.postId;
             const response = await fetch(`/like/${postId}/`, {
                 method: 'POST',
@@ -54,14 +56,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.querySelector('.like-count').textContent = data.likes_count;
             }
         }
-    });
-    document.body.addEventListener('submit', async function (e) {
-        if (e.target.classList.contains('comment-form')) {
+
+        if (form.classList.contains('comment-form')) {
             e.preventDefault();
-            const form = e.target;
             const postId = form.dataset.postId;
             const input = form.querySelector('input[name=content]');
-            const content = input.value;
+            const content = input.value.trim();
+            if (!content) return;
 
             const response = await fetch(`/comment/${postId}/`, {
                 method: 'POST',

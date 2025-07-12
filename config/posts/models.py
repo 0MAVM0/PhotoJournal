@@ -6,3 +6,6 @@ class Post(models.Model):
     image = models.ImageField(upload_to='posts/')
     caption = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_liked_by(self, user):
+        return self.likes.filter(user=user).exists()

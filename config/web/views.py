@@ -91,16 +91,18 @@ class CreatePostView(LoginRequiredMixin, CreateView):
 def ajax_like_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     user = request.user
-    liked = post.likes.filter(id=user.id).exists()
 
-    if liked:
-        post.likes.remove(user)
+    like_obj = Like.objects.filter(user=user, post=post).first()
+    if like_obj:
+        like_obj.delete()
+        liked = False
     else:
-        post.likes.add(user)
+        Like.objects.create(user=user, post=post)
+        liked = True
 
     return JsonResponse({
-        'liked': not liked,
-        'likes_count': post.likes.count(),
+        'liked': liked,
+        'likes_count': post.likes.count()
     })
 
 @require_POST

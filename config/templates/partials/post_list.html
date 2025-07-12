@@ -36,6 +36,7 @@
                 <p class="card-text">{{ post.caption }}</p>
             {% endif %}
             <form class="like-form" data-post-id="{{ post.id }}">
+                {% csrf_token %}
                 <button type="submit" class="btn btn-sm {{ post.is_liked_by_me|yesno:'btn-outline-danger,btn-outline-primary' }}">
                     {{ post.is_liked_by_me|yesno:"Unlike,Like" }}
                 </button>
