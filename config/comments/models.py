@@ -1,5 +1,4 @@
 from django.db import models
-
 from users.models import CustomUser
 from posts.models import Post
 
