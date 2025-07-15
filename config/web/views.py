@@ -154,7 +154,8 @@ class EditPostView(View):
 class ProfileView(View):
     def get(self, request, username):
         profile_user = get_object_or_404(CustomUser, username=username)
-        posts = Post.objects.filter(user=profile_user).order_by('-created_at')
+        posts = Post.objects.filter(user=profile_user).order_by('-created_at')\
+            .prefetch_related('comments', 'likes')
 
         for post in posts:
             post.is_liked_by_me = post.likes.filter(user=request.user).exists() if request.user.is_authenticated else False
