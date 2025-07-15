@@ -4,17 +4,13 @@ from .models import CustomUser
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
-    password2 = serializers.CharField(write_only=True, required=True)
+    password = serializers.CharField(write_only=True, validators=[validate_password])
+    password2 = serializers.CharField(write_only=True)
     avatar = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = CustomUser
         fields = ('username', 'email', 'password', 'password2', 'bio', 'avatar')
-        extra_kwargs = {
-            'email' : { 'required' : True },
-            'username' : { 'required' : True }
-        }
 
     def validate_username(self, value):
         if CustomUser.objects.filter(username=value).exists():
@@ -26,15 +22,14 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('This email is already registered.')
         return value
 
-    def validate(self, attrs):
-        if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({ 'message' : 'Passwords Do Not Match' })
-        return attrs
+    def validate(self, data):
+        if data['password'] != data['password2']:
+            raise serializers.ValidationError({'password2': 'Passwords do not match.'})
+        return data
 
     def create(self, validated_data):
         validated_data.pop('password2')
         user = CustomUser.objects.create_user(**validated_data)
-
         return user
 
 

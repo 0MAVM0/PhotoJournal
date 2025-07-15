@@ -7,7 +7,7 @@ from web.tasks import resize_avatar
 
 
 class CustomUser(AbstractUser):
-    id = models.UUIDField(unique=True, default=uuid.uuid4, editable=False, primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     email = models.EmailField(unique=True)
     bio = models.TextField(blank=True, null=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
@@ -22,11 +22,11 @@ class CustomUser(AbstractUser):
     def save(self, *args, **kwargs):
         old_avatar = None
         if self.pk:
-            old_avatar = CustomUser.objects.get(pk=self.pk).avatar
+            old_avatar = CustomUser.objects.filter(pk=self.pk).first().avatar
 
         super().save(*args, **kwargs)
 
         if self.avatar and self.avatar != old_avatar:
             resize_avatar.delay(self.avatar.path)
-            if old_avatar and os.path.isfile(old_avatar.path) and old_avatar != self.avatar:
+            if old_avatar and os.path.isfile(old_avatar.path):
                 os.remove(old_avatar.path)
