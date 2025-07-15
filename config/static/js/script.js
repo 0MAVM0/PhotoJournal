@@ -79,6 +79,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 newComment.classList.add('mb-1');
                 newComment.innerHTML = `<strong>${data.user}</strong>: ${data.content}`;
                 commentList.prepend(newComment);
+                const emptyNote = commentList.querySelector('p.text-muted');
+                if (emptyNote) {
+                    emptyNote.remove();
+                }
                 input.value = '';
             }
         }
