@@ -3,5 +3,5 @@ from .views import CommentListCreateView, CommentUpdateDeleteView
 
 urlpatterns = [
     path('', CommentListCreateView.as_view(), name='api-comment-list-create'),
-    path('<int:pk>/', CommentUpdateDeleteView.as_view(), name='api-comment-update-delete'),
+    path('<int:pk>/', CommentUpdateDeleteView.as_view(), name='comment-update-delete'),
 ]

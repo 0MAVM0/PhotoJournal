@@ -87,4 +87,53 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+    document.body.addEventListener('click', async function (e) {
+        // Edit comment
+        if (e.target.matches('.btn-edit-comment')) {
+            const commentId = e.target.dataset.id;
+            const newContent = prompt("Edit your comment:");
+            if (!newContent) return;
+    
+            const res = await fetch(`/comments/${commentId}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ content: newContent })
+            });
+    
+            const data = await res.json();
+            if (res.ok) {
+                const commentText = e.target.closest('.mb-1');
+                commentText.innerHTML = `<strong>${data.user}</strong>: ${data.content}`;
+            } else {
+                alert(data.detail || 'Failed to edit comment');
+            }
+        }
+    
+        // Delete comment
+        if (e.target.matches('.btn-delete-comment')) {
+            const commentId = e.target.dataset.id;
+            if (!confirm("Delete this comment?")) return;
+    
+            const res = await fetch(`/comments/${commentId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': getCSRFToken(),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+    
+            if (res.ok) {
+                e.target.closest('.mb-1').remove();
+            } else {
+                alert('Failed to delete comment');
+            }
+        }
+    });
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }    
 });
