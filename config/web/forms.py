@@ -1,10 +1,11 @@
-from django.contrib.auth.password_validation import validate_password
-from django.contrib.auth import get_user_model
 from django import forms
+from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
 
 from posts.models import Post
 
 User = get_user_model()
+
 
 class RegisterForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, validators=[validate_password])

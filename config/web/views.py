@@ -1,25 +1,24 @@
-from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import CreateView, ListView
+from django.views import View
 from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
-from django.contrib.auth.views import LoginView
 from django.contrib.auth import login
-from django.db.models import Subquery
-from django.urls import reverse_lazy
-from django.http import JsonResponse
 from django.contrib import messages
-from django.views import View
+from django.http import JsonResponse
+from django.db.models import Subquery
+from django.views.generic import CreateView, ListView
+from django.contrib.auth.views import LoginView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse_lazy
 
-from .forms import RegisterForm, PostEditForm
+from posts.models import Post
 from posts.forms import PostCreateForm
 from users.forms import UserUpdateForm
-from comments.models import Comment
 from users.models import CustomUser
-from posts.models import Post
+from comments.models import Comment
 from likes.models import Like
+from .forms import RegisterForm, PostEditForm
 
 
 @method_decorator(login_required, name='dispatch')
@@ -27,7 +26,6 @@ class HomeView(ListView):
     model = Post
     template_name = 'home.html'
     context_object_name = 'posts'
-    ordering = ['-created_at']
     paginate_by = 5
 
     def get_queryset(self):
@@ -35,39 +33,33 @@ class HomeView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            liked_posts_ids = set(self.request.user.likes.values_list('post_id', flat=True))
-            for post in context['posts']:
-                post.is_liked_by_me = post.id in liked_posts_ids
-                post.likes_count = post.likes.count()
-                post.comments_count = post.comments.count()
-        else:
-            for post in context['posts']:
-                post.is_liked_by_me = post.likes.filter(user=self.request.user).exists()
+        user = self.request.user
+        liked_ids = set(user.likes.values_list('post_id', flat=True)) if user.is_authenticated else set()
+
+        for post in context['posts']:
+            post.is_liked_by_me = post.id in liked_ids
+            post.likes_count = post.likes.count()
+            post.comments_count = post.comments.count()
+
         return context
 
 
 class RegisterPageView(View):
     def get(self, request):
-        form = RegisterForm()
-
-        return render(request, 'register.html', { 'form': form })
+        return render(request, 'register.html', {'form': RegisterForm()})
 
     def post(self, request):
         form = RegisterForm(request.POST, request.FILES)
-
         if form.is_valid():
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
             user.save()
             login(request, user)
             messages.success(request, 'You have successfully registered!')
-
             return redirect('home')
-        else:
-            messages.error(request, 'Please fix the errors below.')
 
-        return render(request, 'register.html', { 'form': form })
+        messages.error(request, 'Please fix the errors below.')
+        return render(request, 'register.html', {'form': form})
 
 
 class LoginPageView(LoginView):
@@ -96,9 +88,9 @@ def ajax_like_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     user = request.user
 
-    like_obj = Like.objects.filter(user=user, post=post).first()
-    if like_obj:
-        like_obj.delete()
+    like = Like.objects.filter(user=user, post=post).first()
+    if like:
+        like.delete()
         liked = False
     else:
         Like.objects.create(user=user, post=post)
@@ -131,9 +123,9 @@ class DeletePostView(View):
         post = get_object_or_404(Post, pk=pk)
         if post.user != request.user:
             messages.error(request, 'You do not have permission to delete this post.')
-            return redirect('home')
-        post.delete()
-        messages.success(request, 'Post deleted successfully.')
+        else:
+            post.delete()
+            messages.success(request, 'Post deleted successfully.')
         return redirect('home')
 
 
@@ -143,14 +135,14 @@ class EditPostView(View):
         if post.user != request.user:
             messages.error(request, "You cannot edit this post.")
             return redirect('home')
-        form = PostEditForm(instance=post)
-        return render(request, 'edit_post.html', {'form': form, 'post': post})
+        return render(request, 'edit_post.html', {'form': PostEditForm(instance=post), 'post': post})
 
     def post(self, request, pk):
         post = get_object_or_404(Post, pk=pk)
         if post.user != request.user:
             messages.error(request, "You cannot edit this post.")
             return redirect('home')
+
         form = PostEditForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             form.save()
@@ -168,21 +160,15 @@ class ProfileView(View):
             post.is_liked_by_me = post.likes.filter(user=request.user).exists() if request.user.is_authenticated else False
             post.likes_count = post.likes.count()
             post.comment_count = post.comments.count()
-        
-        context = {
-            'profile_user' : profile_user,
-            'posts' : posts,
-        }
 
-        return render(request, 'profile.html', context)
+        return render(request, 'profile.html', {'profile_user': profile_user, 'posts': posts})
 
 
 @method_decorator(login_required, name='dispatch')
 class EditProfileView(View):
     def get(self, request):
-        form = UserUpdateForm(instance=request.user)
-        return render(request, 'edit_profile.html', { 'form' : form })
-    
+        return render(request, 'edit_profile.html', {'form': UserUpdateForm(instance=request.user)})
+
     def post(self, request):
         form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
@@ -190,7 +176,7 @@ class EditProfileView(View):
             messages.success(request, 'Profile updated successfully.')
             return redirect('profile', username=request.user.username)
         messages.error(request, 'Please correct the errors below.')
-        return render(request, 'edit_profile.html', { 'form': form })
+        return render(request, 'edit_profile.html', {'form': form})
 
 
 class LikedPostsView(LoginRequiredMixin, ListView):
@@ -200,16 +186,12 @@ class LikedPostsView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        liked_post_ids = Like.objects.filter(user=self.request.user).values('post_id')
-        return Post.objects.filter(id__in=Subquery(liked_post_ids))\
-            .select_related('user')\
-            .prefetch_related('comments')
+        liked_ids = Like.objects.filter(user=self.request.user).values('post_id')
+        return Post.objects.filter(id__in=Subquery(liked_ids)).select_related('user').prefetch_related('comments')
 
 
 class UserSearchView(View):
     def get(self, request):
-        query = request.GET.get('q')
-        users = CustomUser.objects.all()
-        if query:
-            users = users.filter(username__icontains=query)
-        return render(request, 'user_search.html', { 'users' : users, 'query' : query })
+        query = request.GET.get('q', '')
+        users = CustomUser.objects.filter(username__icontains=query) if query else CustomUser.objects.all()
+        return render(request, 'user_search.html', {'users': users, 'query': query})
