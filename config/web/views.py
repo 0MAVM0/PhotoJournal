@@ -160,7 +160,7 @@ class ProfileView(View):
         for post in posts:
             post.is_liked_by_me = post.likes.filter(user=request.user).exists() if request.user.is_authenticated else False
             post.likes_count = post.likes.count()
-            post.comment_count = post.comments.count()
+            post.comments_count = post.comments.count()
 
         return render(request, 'profile.html', {'profile_user': profile_user, 'posts': posts})
 

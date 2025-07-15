@@ -59,7 +59,17 @@
                     {% endif %}
                     <div class="mt-2 comment-list">
                         {% for comment in post.comments.all|slice:":3" %}
-                            <div class="mb-1"><strong>{{ comment.user }}</strong>: {{ comment.content }}</div>
+                        <div class="mb-1 d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ comment.user }}:</strong> {{ comment.content }}
+                            </div>
+                            {% if comment.user == request.user %}
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button class="btn btn-outline-secondary btn-edit-comment" data-id="{{ comment.id }}">Edit</button>
+                                    <button class="btn btn-outline-danger btn-delete-comment" data-id="{{ comment.id }}">Delete</button>
+                                </div>
+                            {% endif %}
+                        </div>
                         {% empty %}
                             <p class="text-muted">No comments yet.</p>
                         {% endfor %}
