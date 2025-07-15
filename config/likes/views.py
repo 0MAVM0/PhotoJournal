@@ -1,26 +1,26 @@
-from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 
-from posts.models import Post
 from .models import Like
+from posts.models import Post
+
 
 class LikePostView(APIView):
-    def post(self, request, id):
-        post = Post.objects.filter(id=id).first()
-        if not post:
-            return Response({ 'message' : 'Post Was Not Found' }, status=status.HTTP_404_NOT_FOUND)
-        
+    def post(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id)
+
         like, created = Like.objects.get_or_create(user=request.user, post=post)
         if not created:
-            return Response({ 'message' : 'You Have Already Liked This Post Before' }, status=status.HTTP_400_BAD_REQUEST)
-        
-        return Response({ 'message' : 'Liked' }, status=status.HTTP_201_CREATED)
-    
-    def delete(self, request, id):
-        like = Like.objects.filter(user=request.user, post__id=id).first()
+            return Response({'message': 'You have already liked this post.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'message': 'Post liked.'}, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, post_id):
+        like = Like.objects.filter(user=request.user, post_id=post_id).first()
         if not like:
-            return Response({ 'message' : 'You Have Not Liked This Post Yet' }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'You have not liked this post.'}, status=status.HTTP_400_BAD_REQUEST)
 
         like.delete()
-        return Response({ 'message' : 'Liked Deleted' }, status=status.HTTP_200_OK)
+        return Response({'message': 'Like removed.'}, status=status.HTTP_200_OK)
