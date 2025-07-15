@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Post
 
+
 class PostSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)
     image = serializers.ImageField(required=True)
@@ -10,8 +11,14 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('id', 'user', 'image', 'caption', 'created_at', 'comments_count', 'likes_count', 'is_liked_by_me')
-        read_only_fields = ['id', 'user', 'created_at', 'comments_count', 'likes_count', 'is_liked_by_me']
+        fields = (
+            'id', 'user', 'image', 'caption', 'created_at',
+            'comments_count', 'likes_count', 'is_liked_by_me'
+        )
+        read_only_fields = (
+            'id', 'user', 'created_at', 'comments_count',
+            'likes_count', 'is_liked_by_me'
+        )
 
     def get_comments_count(self, obj):
         return obj.comments.count()

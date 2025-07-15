@@ -1,16 +1,21 @@
 from django.urls import path, include
-from .views import PostListCreateView, PostRetrieveUpdateDestroyView, MyPostsView, LikedPostsView
+from .views import (
+    PostListCreateView,
+    PostRetrieveUpdateDestroyView,
+    MyPostsView,
+    LikedPostsView
+)
 
 urlpatterns = [
     # Posts
-    path('', PostListCreateView.as_view(), name='post-list-create'),
-    path('my/', MyPostsView.as_view(), name='my-posts'),
-    path('liked/', LikedPostsView.as_view(), name='liked-posts'),
-    path('<int:pk>/', PostRetrieveUpdateDestroyView.as_view(), name='post-detail'),
+    path('', PostListCreateView.as_view(), name='api-post-list-create'),
+    path('my/', MyPostsView.as_view(), name='api-my-posts'),
+    path('liked/', LikedPostsView.as_view(), name='api-liked-posts'),
+    path('<int:pk>/', PostRetrieveUpdateDestroyView.as_view(), name='api-post-detail'),
 
     # Comments
-    path('<int:id>/comments/', include('comments.urls'), name='comment-list-create'),
+    path('<int:post_id>/comments/', include('comments.urls'), name='api-post-comments'),
 
     # Likes
-    path('<int:id>/like/', include('likes.urls'), name='like-post')
+    path('<int:post_id>/like/', include('likes.urls'), name='api-post-like'),
 ]
