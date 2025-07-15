@@ -3,12 +3,12 @@
 {% block title %}Home | PhotoJournal{% endblock %}
 
 {% block content %}
-    <h2 class="mb-4">Feed</h2>
+    <h2 class="mb-4 fw-semibold">Your Feed</h2>
     <div id="post-container">
         {% include 'partials/post_list.html' %}
     </div>
-    <div id="loading" class="text-center my-3" style="display: none;">
-        <div class="spinner-border" role="status"></div>
+    <div id="loading" class="text-center my-4" style="display: none;">
+        <div class="spinner-border text-primary" role="status"></div>
     </div>
     <div id="load-trigger"></div>
 {% endblock %}

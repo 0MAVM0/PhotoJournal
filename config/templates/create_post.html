@@ -6,8 +6,8 @@
 
 {% block content %}
     <div class="card shadow-sm p-4 mt-4">
-        <h3 class="mb-4 text-center">Create a New Post</h3>
-        <form method="post" enctype="multipart/form-data">
+        <h3 class="mb-4 text-center fw-semibold">Share a New Moment</h3>
+        <form method="post" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
             {% if form.non_field_errors %}
                 <div class="alert alert-danger">
@@ -22,13 +22,13 @@
                 {% endif %}
             </div>
             <div class="mb-3">
-                <label for="id_image" class="form-label">Image</label>
+                <label for="id_image" class="form-label">Upload Image</label>
                 {{ form.image|add_class:"form-control" }}
                 {% if form.image.errors %}
                     <div class="text-danger small">{{ form.image.errors.0 }}</div>
                 {% endif %}
             </div>
-            <button type="submit" class="btn btn-dark w-100">Post</button>
+            <button type="submit" class="btn btn-dark w-100">Publish</button>
         </form>
     </div>
 {% endblock %}

@@ -1,6 +1,6 @@
-# 📸 PhotoJunior
+# 📸 PhotoJournal
 
-**PhotoJunior** — is mini-version of Instagram, made on Django + DRF.
+**PhotoJournal** — is mini-version of Instagram, made on Django + DRF.
 Allows users to create posts with images, to like, to comment, and to view profiles
 as well as using JWT-authentication.
 
