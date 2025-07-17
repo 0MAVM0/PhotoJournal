@@ -55,9 +55,11 @@ python manage.py runserver
 | Applications | Purpose |
 |:-----------|:-----------|
 | users | Registrations, profiles |
-| posts | posts with photoes |
-| comments | comments on posts |
+| posts | Posts with photoes |
+| comments | Comments on posts |
 | likes | Likes |
+| follows | Follows |
+| web | Web-site based on API |
 
 ---
 
