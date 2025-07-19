@@ -1,0 +1,30 @@
+{% extends 'web/base.html' %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex items-center">
+        <img src="{{ profile_user.avatar.url }}" alt="{{ profile_user.username }}" class="w-24 h-24 rounded-full mr-4">
+        <div>
+            <h2 class="text-2xl font-semibold">{{ profile_user.username }}</h2>
+            <p class="text-gray-600">{{ profile_user.bio }}</p>
+            <div class="flex space-x-4 mt-2">
+                <span><strong>{{ posts|length }}</strong> posts</span>
+                <span><strong>{{ followers_count }}</strong> followers</span>
+                <span><strong>{{ following_count }}</strong> following</span>
+            </div>
+            <button class="follow-btn mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+                    data-user-id="{{ profile_user.id }}"
+                    data-following="{% if request.user in profile_user.followers.all %}true{% else %}false{% endif %}">
+                {% if request.user in profile_user.followers.all %}Unfollow{% else %}Follow{% endif %}
+            </button>
+        </div>
+    </div>
+    <div class="grid grid-cols-3 gap-1 mt-6">
+        {% for post in posts %}
+            <a href="{% url 'web:post_detail' post.id %}">
+                <img src="{{ post.image.url }}" alt="Post" class="w-full h-32 object-cover">
+            </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
