@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'comments',
     'likes',
     'follows',
-    'chats'
+    'chats',
     'web_grok',
 ]
 
