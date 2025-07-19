@@ -1,0 +1,43 @@
+{% extends 'web/base.html' %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-xl font-semibold mb-4">Chat with {{ chat.participants|first.username }}</h2>
+    <div class="max-h-96 overflow-y-auto mb-4">
+        {% for message in chat.messages %}
+            <div class="{% if message.sender == request.user %}text-right{% else %}text-left{% endif %} mb-2">
+                <p class="inline-block p-2 rounded-lg {% if message.sender == request.user %}bg-blue-100{% else %}bg-gray-100{% endif %}">
+                    {{ message.content }}
+                </p>
+                <p class="text-xs text-gray-500">{{ message.timestamp }}</p>
+            </div>
+        {% endfor %}
+    </div>
+    <form class="message-form" data-chat-id="{{ chat.id }}">
+        <input type="text" name="content" placeholder="Type a message..." class="w-full p-2 border rounded">
+        <button type="submit" class="text-blue-500">Send</button>
+    </form>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const messageForm = document.querySelector('.message-form');
+    messageForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const chatId = messageForm.dataset.chatId;
+        const content = messageForm.querySelector('input[name="content"]').value;
+        const response = await fetch(`/api/chats/${chatId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`
+            },
+            body: JSON.stringify({ content })
+        });
+        if (response.ok) {
+            messageForm.querySelector('input[name="content"]').value = '';
+            location.reload(); // Temporary reload for simplicity
+        }
+    });
+});
+</script>
+{% endblock %}
