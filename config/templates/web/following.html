@@ -1,0 +1,26 @@
+{% extends 'web/base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
+    <h2 class="text-xl font-semibold mb-4">{{ title }}</h2>
+    <div class="space-y-4">
+        {% for user in users %}
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <img src="{{ user.following.avatar.url|default:'/media/avatars/default.png' }}" alt="{{ user.following_username }}" class="w-8 h-8 rounded-full mr-2">
+                    <a href="{% url 'web:profile' user.following_username %}" class="font-semibold text-sm">{{ user.following_username }}</a>
+                </div>
+                {% if user.following_username != request.user.username %}
+                    <button class="follow-btn px-3 py-1 bg-blue-500 text-white rounded text-sm"
+                            data-user-id="{{ user.following.id }}"
+                            data-following="{% if request.user in user.following.followers.all %}true{% else %}false{% endif %}">
+                        {% if request.user in user.following.followers.all %}Unfollow{% else %}Follow{% endif %}
+                    </button>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p class="text-center text-gray-500">No users found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

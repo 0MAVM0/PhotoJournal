@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 import requests
 import json
@@ -17,9 +17,29 @@ def get_api_data(endpoint, token=None):
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('web:home')
+    if request.method == 'POST':
+        try:
+            response = requests.post(f'{settings.API_BASE_URL}users/login/', data=request.POST)
+            if response.status_code == 200:
+                data = response.json()
+                request.session['access_token'] = data['access']
+                return redirect('web:home')
+        except requests.RequestException:
+            return render(request, 'web/login.html', {'error': 'Invalid credentials'})
     return render(request, 'web/login.html')
 
 def register_view(request):
+    if request.method == 'POST':
+        try:
+            response = requests.post(f'{settings.API_BASE_URL}users/register/', data=request.POST)
+            if response.status_code == 201:
+                data = response.json()
+                request.session['access_token'] = data['access']
+                return redirect('web:home')
+            else:
+                return render(request, 'web/register.html', {'error': response.json().get('detail', 'Registration failed')})
+        except requests.RequestException:
+            return render(request, 'web/register.html', {'error': 'Registration failed'})
     return render(request, 'web/register.html')
 
 def home_view(request):
@@ -59,3 +79,15 @@ def chat_detail_view(request, chat_id):
     token = request.session.get('access_token')
     chat = get_api_data(f'chats/{chat_id}/', token)
     return render(request, 'web/chat_detail.html', {'chat': chat})
+
+@login_required
+def followers_view(request, username):
+    token = request.session.get('access_token')
+    followers = get_api_data(f'follows/{username}/followers/', token)
+    return render(request, 'web/followers.html', {'users': followers, 'title': f"{username}'s Followers"})
+
+@login_required
+def following_view(request, username):
+    token = request.session.get('access_token')
+    following = get_api_data(f'follows/{username}/following/', token)
+    return render(request, 'web/following.html', {'users': following, 'title': f"{username}'s Following"})
