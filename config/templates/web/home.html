@@ -1,37 +1,41 @@
 {% extends 'web/base.html' %}
 
 {% block content %}
-<div class="grid grid-cols-1 gap-6">
-    {% for post in posts %}
-        <div class="bg-white rounded-lg shadow">
-            <div class="p-4 flex items-center">
-                <img src="{{ post.user.avatar.url }}" alt="{{ post.user.username }}" class="w-10 h-10 rounded-full mr-2">
-                <a href="{% url 'web:profile' post.user.username %}" class="font-semibold">{{ post.user.username }}</a>
-            </div>
-            <img src="{{ post.image.url }}" alt="Post" class="w-full">
-            <div class="p-4">
-                <div class="flex items-center space-x-2">
-                    <button class="like-btn text-gray-600" data-post-id="{{ post.id }}"
-                            data-liked="{{ post.is_liked_by_me|yesno:'true,false' }}">
-                        <i class="fas fa-heart {% if post.is_liked_by_me %}text-red-500{% endif %}"></i>
-                    </button>
-                    <span>{{ post.likes_count }} likes</span>
+<div class="max-w-3xl mx-auto">
+    <div class="space-y-6">
+        {% for post in posts %}
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-4 flex items-center">
+                    <img src="{{ post.user.avatar.url|default:'/media/avatars/default.png' }}" alt="{{ post.user.username }}" class="w-8 h-8 rounded-full mr-2">
+                    <a href="{% url 'web:profile' post.user %}" class="font-semibold text-sm">{{ post.user }}</a>
                 </div>
-                <p class="mt-2">{{ post.caption }}</p>
-                <div class="mt-2">
-                    {% for comment in post.comments|slice:":2" %}
-                        <p><strong>{{ comment.user }}</strong> {{ comment.content }}</p>
-                    {% endfor %}
-                    {% if post.comments_count > 2 %}
-                        <a href="{% url 'web:post_detail' post.id %}" class="text-gray-500">View all {{ post.comments_count }} comments</a>
-                    {% endif %}
+                <img src="{{ post.image.url }}" alt="Post" class="w-full object-cover" style="max-height: 600px;">
+                <div class="p-4">
+                    <div class="flex items-center space-x-2">
+                        <button class="like-btn text-gray-600" data-post-id="{{ post.id }}"
+                                data-liked="{{ post.is_liked_by_me|yesno:'true,false' }}">
+                            <i class="fas fa-heart {% if post.is_liked_by_me %}text-red-500{% endif %}"></i>
+                        </button>
+                        <span class="text-sm">{{ post.likes_count }} likes</span>
+                    </div>
+                    <p class="mt-2 text-sm"><strong>{{ post.user }}</strong> {{ post.caption }}</p>
+                    <div class="mt-2 text-sm">
+                        {% for comment in post.comments|slice:":2" %}
+                            <p><strong>{{ comment.user }}</strong> {{ comment.content }}</p>
+                        {% endfor %}
+                        {% if post.comments_count > 2 %}
+                            <a href="{% url 'web:post_detail' post.id %}" class="text-gray-500">View all {{ post.comments_count }} comments</a>
+                        {% endif %}
+                    </div>
+                    <form class="mt-2 comment-form flex" data-post-id="{{ post.id }}">
+                        <input type="text" name="content" placeholder="Add a comment..." class="flex-grow p-2 border rounded-l-lg border-gray-300">
+                        <button type="submit" class="px-3 py-2 text-blue-500">Post</button>
+                    </form>
                 </div>
-                <form class="mt-2 comment-form" data-post-id="{{ post.id }}">
-                    <input type="text" name="content" placeholder="Add a comment..." class="w-full p-2 border rounded">
-                    <button type="submit" class="text-blue-500">Post</button>
-                </form>
             </div>
-        </div>
-    {% endfor %}
+        {% empty %}
+            <p class="text-center text-gray-500">No posts available.</p>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
