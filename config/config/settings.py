@@ -38,9 +38,9 @@ INSTALLED_APPS = [
     'posts',
     'comments',
     'likes',
-    'web',
     'follows',
     'chats'
+    'web_grok',
 ]
 
 MIDDLEWARE = [

@@ -32,7 +32,7 @@ urlpatterns = [
     path('api/posts/', include('posts.urls')),
     path('api/follows/', include('posts.urls')),
     path('api/chats/', include('chats.urls')),
-    path('', include('web.urls')),
+    path('', include('web_grok.urls')),
 ]
 
 if settings.DEBUG:
