@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Chat, Message
 from users.models import CustomUser
-
+from users.serializers import UserProfileSerializer
 
 class MessageSerializer(serializers.ModelSerializer):
     sender_username = serializers.CharField(source='sender.username', read_only=True)
@@ -13,7 +13,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class ChatSerializer(serializers.ModelSerializer):
-    participants = serializers.SlugRelatedField(slug_field='username', many=True, queryset=CustomUser.objects.all())
+    participants = UserProfileSerializer(many=True, read_only=True)
     last_message = serializers.SerializerMethodField()
 
     class Meta:

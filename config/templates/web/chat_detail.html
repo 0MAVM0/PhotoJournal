@@ -1,43 +1,62 @@
 {% extends 'web/base.html' %}
 
 {% block content %}
-<div class="bg-white rounded-lg shadow p-6">
-    <h2 class="text-xl font-semibold mb-4">Chat with {{ chat.participants|first.username }}</h2>
-    <div class="max-h-96 overflow-y-auto mb-4">
-        {% for message in chat.messages %}
-            <div class="{% if message.sender == request.user %}text-right{% else %}text-left{% endif %} mb-2">
-                <p class="inline-block p-2 rounded-lg {% if message.sender == request.user %}bg-blue-100{% else %}bg-gray-100{% endif %}">
-                    {{ message.content }}
-                </p>
-                <p class="text-xs text-gray-500">{{ message.timestamp }}</p>
-            </div>
-        {% endfor %}
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
+        {% with other_user=chat.participants|first %}
+            {% if other_user.username == request.user.username %}
+                {% with other_user=chat.participants|last %}
+                    <h2 class="text-xl font-semibold mb-4">Chat with {{ other_user.username }}</h2>
+                {% endwith %}
+            {% else %}
+                <h2 class="text-xl font-semibold mb-4">Chat with {{ other_user.username }}</h2>
+            {% endif %}
+        {% endwith %}
+        <div class="max-h-96 overflow-y-auto mb-4" id="message-section">
+            {% for message in chat.messages %}
+                <div class="{% if message.sender.username == request.user.username %}text-right{% else %}text-left{% endif %} mb-2">
+                    <p class="inline-block p-2 rounded-lg {% if message.sender.username == request.user.username %}bg-blue-100{% else %}bg-gray-100{% endif %}">
+                        {{ message.content }}
+                    </p>
+                    <p class="text-xs text-gray-500">{{ message.timestamp }}</p>
+                </div>
+            {% empty %}
+                <p class="text-sm text-gray-500">No messages yet.</p>
+            {% endfor %}
+        </div>
+        <form class="message-form flex" data-chat-id="{{ chat.id }}">
+            <input type="text" name="content" placeholder="Type a message..." class="flex-grow p-2 border rounded-l-lg border-gray-300">
+            <button type="submit" class="px-3 py-2 text-blue-500">Send</button>
+        </form>
     </div>
-    <form class="message-form" data-chat-id="{{ chat.id }}">
-        <input type="text" name="content" placeholder="Type a message..." class="w-full p-2 border rounded">
-        <button type="submit" class="text-blue-500">Send</button>
-    </form>
-</div>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const messageForm = document.querySelector('.message-form');
-    messageForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const chatId = messageForm.dataset.chatId;
-        const content = messageForm.querySelector('input[name="content"]').value;
-        const response = await fetch(`/api/chats/${chatId}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`
-            },
-            body: JSON.stringify({ content })
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const messageForm = document.querySelector('.message-form');
+        const messageSection = document.getElementById('message-section');
+        messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const chatId = messageForm.dataset.chatId;
+            const content = messageForm.querySelector('input[name="content"]').value;
+            const response = await fetch(`/api/chats/${chatId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`
+                },
+                body: JSON.stringify({ content })
+            });
+            if (response.ok) {
+                const message = await response.json();
+                const newMessage = document.createElement('div');
+                newMessage.className = 'text-right mb-2';
+                newMessage.innerHTML = `
+                    <p class="inline-block p-2 rounded-lg bg-blue-100">${message.content}</p>
+                    <p class="text-xs text-gray-500">${new Date().toLocaleString()}</p>
+                `;
+                messageSection.appendChild(newMessage);
+                messageSection.scrollTop = messageSection.scrollHeight;
+                messageForm.querySelector('input[name="content"]').value = '';
+            }
         });
-        if (response.ok) {
-            messageForm.querySelector('input[name="content"]').value = '';
-            location.reload(); // Temporary reload for simplicity
-        }
     });
-});
-</script>
+    </script>
 {% endblock %}

@@ -1,18 +1,34 @@
 {% extends 'web/base.html' %}
 
 {% block content %}
-<div class="bg-white rounded-lg shadow p-6">
-    <h2 class="text-xl font-semibold mb-4">Messages</h2>
-    <div class="space-y-4">
-        {% for chat in chats %}
-            <a href="{% url 'web:chat_detail' chat.id %}" class="flex items-center p-2 hover:bg-gray-100 rounded">
-                <img src="{{ chat.participants|first.avatar.url }}" alt="User" class="w-10 h-10 rounded-full mr-2">
-                <div>
-                    <p class="font-semibold">{{ chat.participants|first.username }}</p>
-                    <p class="text-gray-600 text-sm">{{ chat.last_message.content|truncatechars:30 }}</p>
-                </div>
-            </a>
-        {% endfor %}
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">Messages</h2>
+        <div class="space-y-4">
+            {% for chat in chats %}
+                {% with other_user=chat.participants|first %}
+                    {% if other_user.username != request.user.username %}
+                        <a href="{% url 'web:chat_detail' chat.id %}" class="flex items-center p-2 hover:bg-gray-100 rounded">
+                            <img src="{{ other_user.avatar.url|default:'/media/avatars/default.png' }}" alt="{{ other_user.username }}" class="w-10 h-10 rounded-full mr-2">
+                            <div>
+                                <p class="font-semibold">{{ other_user.username }}</p>
+                                <p class="text-gray-600 text-sm">{{ chat.last_message.content|truncatechars:30|default:'No messages yet' }}</p>
+                            </div>
+                        </a>
+                    {% else %}
+                        {% with other_user=chat.participants|last %}
+                            <a href="{% url 'web:chat_detail' chat.id %}" class="flex items-center p-2 hover:bg-gray-100 rounded">
+                                <img src="{{ other_user.avatar.url|default:'/media/avatars/default.png' }}" alt="{{ other_user.username }}" class="w-10 h-10 rounded-full mr-2">
+                                <div>
+                                    <p class="font-semibold">{{ other_user.username }}</p>
+                                    <p class="text-gray-600 text-sm">{{ chat.last_message.content|truncatechars:30|default:'No messages yet' }}</p>
+                                </div>
+                            </a>
+                        {% endwith %}
+                    {% endif %}
+                {% endwith %}
+            {% empty %}
+                <p class="text-center text-gray-500">No chats available.</p>
+            {% endfor %}
+        </div>
     </div>
-</div>
 {% endblock %}
