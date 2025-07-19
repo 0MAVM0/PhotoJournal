@@ -45,3 +45,15 @@ def post_detail_view(request, post_id):
     post = get_api_data(f'/posts/{post_id}/', token)
     comments = get_api_data(f'/posts/{post_id}/comments/', token)
     return render(request, 'web/post_detail.html', {'post': post, 'comments': comments})
+
+@login_required
+def chats_view(request):
+    token = request.session.get('access_token')
+    chats = get_api_data('/chats/', token)
+    return render(request, 'web/chats.html', {'chats': chats})
+
+@login_required
+def chat_detail_view(request, chat_id):
+    token = request.session.get('access_token')
+    chat = get_api_data(f'/chats/{chat_id}/', token)
+    return render(request, 'web/chat_detail.html', {'chat': chat})

@@ -9,4 +9,6 @@ urlpatterns = [
     path('register/', views.register_view, name='register'),
     path('profile/<str:username>/', views.profile_view, name='profile'),
     path('post/<int:post_id>/', views.post_detail_view, name='post_detail'),
+    path('messages/', views.chats_view, name='chats'),
+    path('messages/<int:chat_id>/', views.chat_detail_view, name='chat_detail'),
 ]
