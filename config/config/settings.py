@@ -156,3 +156,5 @@ SIMPLE_JWT = {
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = [ 'json' ]
 CELERY_TASK_SERIALIZER = 'json'
+
+API_BASE_URL = 'http://127.0.0.1:8000/api/'

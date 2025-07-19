@@ -7,9 +7,12 @@ import json
 
 def get_api_data(endpoint, token=None):
     headers = {'Authorization': f'Bearer {token}'} if token else {}
-    response = requests.get(f'{settings.API_BASE_URL}{endpoint}', headers=headers)
-    response.raise_for_status()
-    return response.json()
+    try:
+        response = requests.get(f'{settings.API_BASE_URL}{endpoint}', headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException:
+        return []
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -19,19 +22,18 @@ def login_view(request):
 def register_view(request):
     return render(request, 'web/register.html')
 
-@login_required
 def home_view(request):
-    token = request.session.get('access_token')
-    posts = get_api_data('/posts/', token)
+    token = request.session.get('access_token') if request.user.is_authenticated else None
+    posts = get_api_data('posts/', token)
     return render(request, 'web/home.html', {'posts': posts})
 
 @login_required
 def profile_view(request, username):
     token = request.session.get('access_token')
-    user = get_api_data(f'/users/{username}/', token)
-    posts = get_api_data(f'/posts/?user__username={username}', token)
-    followers = get_api_data(f'/follows/{username}/followers/', token)
-    following = get_api_data(f'/follows/{username}/following/', token)
+    user = get_api_data(f'users/{username}/', token)
+    posts = get_api_data(f'posts/?user__username={username}', token)
+    followers = get_api_data(f'follows/{username}/followers/', token)
+    following = get_api_data(f'follows/{username}/following/', token)
     return render(request, 'web/profile.html', {
         'profile_user': user,
         'posts': posts,
@@ -42,18 +44,18 @@ def profile_view(request, username):
 @login_required
 def post_detail_view(request, post_id):
     token = request.session.get('access_token')
-    post = get_api_data(f'/posts/{post_id}/', token)
-    comments = get_api_data(f'/posts/{post_id}/comments/', token)
+    post = get_api_data(f'posts/{post_id}/', token)
+    comments = get_api_data(f'posts/{post_id}/comments/', token)
     return render(request, 'web/post_detail.html', {'post': post, 'comments': comments})
 
 @login_required
 def chats_view(request):
     token = request.session.get('access_token')
-    chats = get_api_data('/chats/', token)
+    chats = get_api_data('chats/', token)
     return render(request, 'web/chats.html', {'chats': chats})
 
 @login_required
 def chat_detail_view(request, chat_id):
     token = request.session.get('access_token')
-    chat = get_api_data(f'/chats/{chat_id}/', token)
+    chat = get_api_data(f'chats/{chat_id}/', token)
     return render(request, 'web/chat_detail.html', {'chat': chat})
